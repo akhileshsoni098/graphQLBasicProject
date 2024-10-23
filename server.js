@@ -1,4 +1,3 @@
-// public call dotenv this is root
 
 require('dotenv').config();
 
@@ -6,15 +5,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const {graphqlHTTP} = require('express-graphql');
-const graphQlSchema = require('./graphQL/schema/graphQlUserSchema');
-const graphQlResolvers = require('./graphQL/resolvers/graphQlUserResolvers');
+const schemaMerger = require('./graphQL/schema/mergeSchema');
+const mergeResolvers = require('./graphQL/resolvers/mergerResolvers');
+
 const app = express();
 
 app.use(express.json());
 
 app.use(cors());
-
-
 
 
 mongoose.connect(process.env.MONGODB_URL_LOCAL)
@@ -24,8 +22,8 @@ mongoose.connect(process.env.MONGODB_URL_LOCAL)
 
 app.use("/",
     graphqlHTTP({
-      schema: graphQlSchema,
-      rootValue: graphQlResolvers,
+      schema: schemaMerger,
+      rootValue: mergeResolvers,
       graphiql: true,
     })
   );

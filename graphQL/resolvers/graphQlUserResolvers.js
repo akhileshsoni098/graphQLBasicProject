@@ -1,6 +1,7 @@
 const User = require("../../model/userModel");
 
-const resolvers = {
+const resolversUser = {
+
   getUser: async ({ id, name, email }) => {
     try {
       const filter = {};
@@ -79,4 +80,4 @@ const resolvers = {
   },
 };
 
-module.exports = resolvers;
+module.exports = resolversUser;
