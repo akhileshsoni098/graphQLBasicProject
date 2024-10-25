@@ -53,8 +53,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
-const schemaMerger = require("./graphQL/schema/mergeSchema"); // typeDefs
-const mergeResolvers = require("./graphQL/resolvers/mergerResolvers"); // resolvers
+const schemaMerger = require("./graphQL/schema/mergeSchema"); 
+const mergeResolvers = require("./graphQL/resolvers/mergerResolvers"); 
 const { authentication } = require("./middi/auth");
 const expressPlayground = require("graphql-playground-middleware-express").default;
 
