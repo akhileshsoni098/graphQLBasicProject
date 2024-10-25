@@ -18,8 +18,8 @@ const userSchema = `
   extend type Mutation {
     createUser(name: String!, email: String!, password: String!): Auth
     logInUser(email: String!, password: String!): Auth
-    updateUser(id: ID!, name: String!): User
-    deleteUser(id: ID!): User
+    updateUser(name: String): User
+    deleteUser: String!
   }
 `;
 

@@ -35,6 +35,7 @@ const typeDefs = `
   }
   
   ${userSchema}
+  ${schemaBlog}
 `; 
 
 const schemaMerger = makeExecutableSchema({ typeDefs });

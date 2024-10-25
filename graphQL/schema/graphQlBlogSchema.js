@@ -1,22 +1,23 @@
 const { buildSchema } = require("graphql");
-
+// User is extracted from the UserSchema 
 const schemaBlog = `
     type Blog {
     id:ID!
-    userId:User!
+    userId:User!  
     title:String!
     description:String!
     }
 
     extend type Query {
-    getBlog(id: ID!,userId:ID!): Blog
-    getBlogs(userId: ID!): [Blog]
+    getBlog(id:ID!): Blog
+    myBlogs: [Blog]
+    getBlogs: [Blog]
     }
 
     extend type Mutation {
-    createBlog(userId: ID!, title: String!, description: String!):Blog
-    updateBlog( id:ID!,userId:ID! title: String, description: String):Blog
-    deleteBlog(id:ID!, userId:ID!): Blog
+    createBlog(title: String!, description: String!):Blog
+    updateBlog( id:ID!, title: String, description: String):Blog
+    deleteBlog(id:ID!): String!
     }
 
     `;

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/userModel");
 
-exports.authentication = async function (req, res, next) {
+/* exports.authentication = async function (req, res, next) {
   // Retrieve token from request headers
   let token = req.headers["x-auth-token"];
 
@@ -34,4 +34,31 @@ exports.authentication = async function (req, res, next) {
     console.log("Verification failed!", err)
     next()
   }
-};
+}; */
+
+
+exports.authentication = async function createContext(req) {
+  let context = {};
+  const token = req.headers["x-auth-token"];
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const user = await User.findById(decoded._id);
+
+      if (user) {
+        context = {
+          user: {
+            _id: user._id,
+            role: user.role,
+            name: user.name,
+            email: user.email,
+          },
+        };
+      }
+    } catch (err) {
+      console.log("Token verification failed:", err.message);
+    }
+  }
+  return context;
+}

@@ -1,76 +1,113 @@
 const Blog = require("../../model/blogModel");
+const User = require("../../model/userModel");
 
 const resolversBlog = {
-  getBlogs: async ({ userId }) => {
-    try {
-      const getAllBlogs = await Blog.find({ userId: userId }).populate(
-        "userId"
-      );
-      return getAllBlogs;
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  },
-
-  getBlog: async ({ id, userId }) => {
-    try {
-      const getSingleBlog = await Blog.findOne({
-        _id: id,
-        userId: userId,
-      }).populate("userId");
-
-      if (!getSingleBlog) {
-        return "No blog found";
+  Query: {
+    // auth required
+    myBlogs: async (parent, args, context) => {
+      try {
+        if (!context.user || !context.user._id) {
+          throw new Error("User not authenticated");
+        }
+        const blogs = await Blog.find({ userId: context.user._id }).populate(
+          "userId"
+        );
+        return blogs;
+      } catch (err) {
+        throw new Error(err.message);
       }
+    },
 
-      return getSingleBlog;
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  },
-
-  createBlog: async ({ userId, title, description }) => {
-    try {
-      const createBlog = await Blog.create({ userId, title, description });
-      const populatedBlog = await Blog.findById(createBlog._id).populate("userId");
-
-      return populatedBlog;
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  },
-
-  updateBlog: async ({ id, userId, title, description }) => {
-    try {
-      const updatedBlog = await Blog.findOneAndUpdate(
-        { _id: id, userId: userId },
-        { title, description },
-        { new: true }
-      )
-      if (!updatedBlog) {
-        return "No blog found to update";
+    getBlog: async (parent, args, context) => {
+      try {
+        if (!context.user || !context.user._id) {
+          throw new Error("User not authenticated");
+        }
+        const blog = await Blog.findById(args.id).populate("userId");
+        if (!blog) {
+          throw new Error("Blog not found");
+        }
+        return blog;
+      } catch (err) {
+        throw new Error(err.message);
       }
-      const populatedBlog = await Blog.findById(updatedBlog._id).populate("userId");
-      return populatedBlog;
-    } catch (err) {
-      throw new Error(err.message);
-    }
+    },
+
+    getBlogs: async (parent, args) => {
+      try {
+        const blogs = await Blog.find().populate("userId");
+        return blogs;
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    },
   },
 
-  deleteBlog: async ({ id, userId }) => {
-    try {
-      const deletedBlog = await Blog.findOneAndDelete({
-        _id: id,
-        userId: userId,
-      });
-      if (!deletedBlog) {
-        return "No blog found to delete";
+  Mutation: {
+    createBlog: async (parent, args, context) => {
+      try {
+        if (!context.user || !context.user._id) {
+          throw new Error("User not authenticated");
+        }
+        const newBlog = await Blog.create({
+          ...args,
+          userId: context.user._id,
+        });
+
+        const user = await User.findById(newBlog.userId);
+
+        return {
+          id: newBlog._id,
+          title: newBlog.title,
+          description: newBlog.description,
+          userId: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        };
+      } catch (err) {
+        throw new Error(err.message);
       }
-      return "Blog deleted successfully";
-    } catch (err) {
-      throw new Error(err.message);
-    }
+    },
+
+    updateBlog: async (parent, args, context) => {
+      try {
+        if (!context.user || !context.user._id) {
+          throw new Error("User not authenticated");
+        }
+        const updatedBlog = await Blog.findOneAndUpdate(
+          { _id: args.id, userId: context.user._id },
+          { ...args },
+          { new: true }
+        ).populate("userId");
+        if (!updatedBlog) {
+          throw new Error("Blog not found");
+        }
+        return updatedBlog;
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    },
+
+    deleteBlog: async (parent, args, context) => {
+      try {
+        if (!context.user || !context.user._id) {
+          throw new Error("User not authenticated");
+        }
+        const deletedBlog = await Blog.findOneAndDelete({
+          _id: args.id,
+          userId: context.user._id,
+        });
+        if (!deletedBlog) {
+          throw new Error("Blog not found");
+        }
+        return "Blog deleted successfully";
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    },
   },
 };
-
 module.exports = resolversBlog;

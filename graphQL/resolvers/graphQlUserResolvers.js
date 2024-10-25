@@ -6,8 +6,7 @@ const resolversUser = {
   Query: {
     getUser: async (parent, args, context) => {
       try {
-        console.log("Context user:", context.user);
-
+        // console.log("Context user:", context.user);
         if (!context.user || !context.user._id) {
           throw new Error("Not authenticated.");
         }
@@ -82,24 +81,26 @@ const resolversUser = {
         },
       };
     },
-    updateUser: async ({ id, name }) => {
+    updateUser: async (parent,{ name },context) => {
       try {
-        if (!id) {
-          throw new Error("ID is required.");
+
+        if (!context.user || !context.user._id) {
+          throw new Error("Not authenticated.");
         }
-        const user = await User.findByIdAndUpdate(id, { name }, { new: true });
+        const user = await User.findByIdAndUpdate(context.user._id, { name }, { new: true });
         return user;
       } catch (err) {
         throw new Error(err.message);
       }
     },
-    deleteUser: async ({ id }) => {
+    deleteUser: async (parent,{},context) => {
       try {
-        if (!id) {
-          throw new Error("ID is required.");
+
+        if (!context.user || !context.user._id) {
+          throw new Error("Not authenticated.");
         }
-        const user = await User.findByIdAndDelete(id);
-        return user;
+        const user = await User.findByIdAndDelete(context.user._id);
+        return "User Deleted Successfully.";
       } catch (err) {
         throw new Error(err.message);
       }
