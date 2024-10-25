@@ -3,7 +3,7 @@ const resolversUser = require("./graphQlUserResolvers");
 
 const mergeResolvers = {
    ...resolversUser,
-   ...resolversBlog
+   // ...resolversBlog
 
 }
 
